@@ -4,165 +4,502 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Heart disease prediction using a trained Logistic Regression model for an educational machine learning project.">
   <title>Heart Disease Prediction</title>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 760px;
-      margin: 35px auto;
-      padding: 20px;
-      background: #f4f7fb;
-      color: #1f2937;
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #687386;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border: #dce3ed;
+      --success: #16794b;
+      --success-bg: #eaf8f0;
+      --warning: #9a3412;
+      --warning-bg: #fff7ed;
     }
-    h1 { color: #1456a0; }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #10234a;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(25px, 4vw, 36px);
+    }
+
+    header p {
+      margin: 0;
+      color: #d5e1ff;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 30px auto;
+      padding: 0 18px;
+    }
+
     .notice {
-      padding: 12px;
-      background: #fff4d6;
-      border-radius: 8px;
+      background: #fff8e6;
+      border: 1px solid #f0d28a;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 22px;
+      color: #704c08;
       font-size: 14px;
     }
-    form {
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 22px;
+      box-shadow: 0 5px 20px rgba(20, 40, 80, 0.04);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 5px;
+      font-size: 22px;
+    }
+
+    .intro {
+      color: var(--muted);
+      margin-top: 0;
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin: 25px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 17px;
+    }
+
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: normal;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
       background: white;
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 2px solid #93b4ff;
+      border-color: var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 20px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .secondary {
+      background: #e9eef7;
+      color: #24324a;
+    }
+
+    button:focus-visible {
+      outline: 3px solid #93b4ff;
+      outline-offset: 2px;
+    }
+
+    #result {
+      display: none;
+      margin-top: 22px;
       padding: 20px;
       border-radius: 12px;
+      overflow-wrap: anywhere;
     }
-    label { display: block; font-weight: bold; }
-    input, select, button {
-      box-sizing: border-box;
-      width: 100%;
-      margin-top: 7px;
-      padding: 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
+
+    #result.show {
+      display: block;
     }
-    button {
-      background: #1456a0;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      grid-column: 1 / -1;
+
+    #result.success {
+      background: var(--success-bg);
+      border: 1px solid #a8dfbd;
+      color: var(--success);
     }
-    #result {
-      margin-top: 20px;
-      padding: 16px;
-      background: white;
-      border-radius: 10px;
-      white-space: pre-line;
+
+    #result.warning {
+      background: var(--warning-bg);
+      border: 1px solid #fed7aa;
+      color: var(--warning);
+    }
+
+    #result h3 {
+      margin: 0 0 8px;
+    }
+
+    .probability-track {
+      height: 12px;
+      border-radius: 99px;
+      background: rgba(100, 116, 139, 0.2);
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    #probabilityBar {
+      height: 100%;
+      width: 0;
+      background: currentColor;
+      transition: width 0.25s ease;
+    }
+
+    .small {
+      font-size: 13px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px 20px 30px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding: 25px 15px;
+      }
     }
   </style>
 </head>
+
 <body>
-  <h1>Heart Disease Prediction</h1>
-  <p>Educational machine learning project</p>
+  <header>
+    <h1>Heart Disease Prediction</h1>
+    <p>Machine Learning Project · Logistic Regression</p>
+  </header>
 
-  <div class="notice">
-    This website is a demonstration only. It does not diagnose heart
-    disease or replace advice from a qualified healthcare professional.
-  </div>
+  <main>
+    <div class="notice">
+      <strong>Educational use only:</strong> This model is a student
+      project trained on a heart disease dataset. It cannot diagnose
+      heart disease or determine an individual's actual medical risk.
+      Do not use its output to make medical decisions.
+    </div>
 
-  <h2>Patient Information</h2>
+    <section class="card">
+      <h2>Patient Information</h2>
+      <p class="intro">
+        Enter all 13 features and click the button to run the trained model.
+        The category codes below follow the dataset used for training.
+      </p>
 
-  <form id="predictionForm">
-    <label>Age
-      <input name="age" type="number" min="1" max="120" value="50" required>
-    </label>
+      <form id="predictionForm">
+        <h3 class="section-title">1. Basic Information</h3>
 
-    <label>Sex
-      <select name="sex">
-        <option value="0">Female (0)</option>
-        <option value="1" selected>Male (1)</option>
-      </select>
-    </label>
+        <div class="grid">
+          <div class="field">
+            <label for="age">Age (years)</label>
+            <input id="age" name="age" type="number"
+                   min="1" max="120" step="1" value="50" required>
+          </div>
 
-    <label>Chest pain type (cp)
-      <select name="cp">
-        <option value="1">1</option>
-        <option value="2" selected>2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-    </label>
+          <div class="field">
+            <label for="sex">Sex</label>
+            <select id="sex" name="sex" required>
+              <option value="1" selected>1 — Male</option>
+              <option value="0">0 — Female</option>
+            </select>
+          </div>
 
-    <label>Resting blood pressure
-      <input name="trestbps" type="number" value="120" required>
-    </label>
+          <div class="field">
+            <label for="cp">Chest Pain Type</label>
+            <select id="cp" name="cp" required>
+              <option value="1">1 — Typical angina</option>
+              <option value="2" selected>2 — Atypical angina</option>
+              <option value="3">3 — Non-anginal pain</option>
+              <option value="4">4 — Asymptomatic</option>
+            </select>
+          </div>
+        </div>
 
-    <label>Cholesterol
-      <input name="chol" type="number" value="200" required>
-    </label>
+        <h3 class="section-title">2. Clinical Measurements</h3>
 
-    <label>Fasting blood sugar (fbs)
-      <select name="fbs">
-        <option value="0" selected>0</option>
-        <option value="1">1</option>
-      </select>
-    </label>
+        <div class="grid">
+          <div class="field">
+            <label for="trestbps">Resting Blood Pressure
+              <span class="hint">(mm Hg)</span>
+            </label>
+            <input id="trestbps" name="trestbps" type="number"
+                   min="50" max="300" step="1" value="120" required>
+          </div>
 
-    <label>Resting ECG (restecg)
-      <select name="restecg">
-        <option value="0" selected>0</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-      </select>
-    </label>
+          <div class="field">
+            <label for="chol">Serum Cholesterol
+              <span class="hint">(mg/dL)</span>
+            </label>
+            <input id="chol" name="chol" type="number"
+                   min="50" max="700" step="1" value="200" required>
+          </div>
 
-    <label>Maximum heart rate (thalach)
-      <input name="thalach" type="number" value="150" required>
-    </label>
+          <div class="field">
+            <label for="fbs">Fasting Blood Sugar
+              <span class="hint">(greater than 120 mg/dL)</span>
+            </label>
+            <select id="fbs" name="fbs" required>
+              <option value="0" selected>0 — False</option>
+              <option value="1">1 — True</option>
+            </select>
+          </div>
 
-    <label>Exercise-induced angina (exang)
-      <select name="exang">
-        <option value="0" selected>No (0)</option>
-        <option value="1">Yes (1)</option>
-      </select>
-    </label>
+          <div class="field">
+            <label for="restecg">Resting ECG Result</label>
+            <select id="restecg" name="restecg" required>
+              <option value="0" selected>0 — Normal</option>
+              <option value="1">1 — ST-T abnormality</option>
+              <option value="2">2 — Left ventricular hypertrophy</option>
+            </select>
+          </div>
 
-    <label>ST depression (oldpeak)
-      <input name="oldpeak" type="number" step="0.1" value="1.0" required>
-    </label>
+          <div class="field">
+            <label for="thalach">Maximum Heart Rate Achieved</label>
+            <input id="thalach" name="thalach" type="number"
+                   min="40" max="250" step="1" value="150" required>
+          </div>
 
-    <label>Slope
-      <select name="slope">
-        <option value="1">1</option>
-        <option value="2" selected>2</option>
-        <option value="3">3</option>
-      </select>
-    </label>
+          <div class="field">
+            <label for="exang">Exercise-Induced Angina</label>
+            <select id="exang" name="exang" required>
+              <option value="0" selected>0 — No</option>
+              <option value="1">1 — Yes</option>
+            </select>
+          </div>
 
-    <label>Major vessels (ca)
-      <select name="ca">
-        <option value="0" selected>0</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-      </select>
-    </label>
+          <div class="field">
+            <label for="oldpeak">Oldpeak
+              <span class="hint">(ST depression)</span>
+            </label>
+            <input id="oldpeak" name="oldpeak" type="number"
+                   min="-5" max="10" step="0.1" value="1.0" required>
+          </div>
 
-    <label>Thal
-      <select name="thal">
-        <option value="3" selected>3</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-      </select>
-    </label>
+          <div class="field">
+            <label for="slope">ST Segment Slope</label>
+            <select id="slope" name="slope" required>
+              <option value="1">1 — Upsloping</option>
+              <option value="2" selected>2 — Flat</option>
+              <option value="3">3 — Downsloping</option>
+            </select>
+          </div>
 
-    <button type="submit">Predict</button>
-  </form>
+          <div class="field">
+            <label for="ca">Major Vessels (ca)</label>
+            <select id="ca" name="ca" required>
+              <option value="0" selected>0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
 
-  <div id="result" role="status">
-    The prediction will appear here.
-  </div>
+          <div class="field">
+            <label for="thal">Thalassemia (thal)</label>
+            <select id="thal" name="thal" required>
+              <option value="3" selected>3 — Normal</option>
+              <option value="6">6 — Fixed defect</option>
+              <option value="7">7 — Reversible defect</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" type="submit">
+            Predict
+          </button>
+          <button class="secondary" type="reset">
+            Reset Form
+          </button>
+        </div>
+      </form>
+
+      <div id="result" role="status" aria-live="polite">
+        <h3 id="resultTitle"></h3>
+        <p id="resultDescription"></p>
+        <strong id="probabilityText"></strong>
+        <div class="probability-track" aria-hidden="true">
+          <div id="probabilityBar"></div>
+        </div>
+        <p class="small">
+          This percentage is the model's estimated probability for
+          class 1, not a clinically validated personal risk estimate.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>About This Project</h2>
+      <p>
+        This website demonstrates a Logistic Regression model trained
+        using a heart disease dataset. It applies the same numerical
+        scaling and categorical encoding used during training.
+      </p>
+      <p class="small">
+        The model is intended for machine learning education and
+        demonstration, not medical diagnosis, screening, or treatment.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Student Machine Learning Project · Heart Disease Prediction
+  </footer>
+
+  <!-- Load the trained model's JavaScript implementation first. -->
+  <script src="model.js"></script>
 
   <script>
-    document.getElementById("predictionForm").addEventListener("submit", function(event) {
+    const form = document.getElementById("predictionForm");
+    const result = document.getElementById("result");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultDescription = document.getElementById("resultDescription");
+    const probabilityText = document.getElementById("probabilityText");
+    const probabilityBar = document.getElementById("probabilityBar");
+
+    form.addEventListener("submit", function (event) {
       event.preventDefault();
-      document.getElementById("result").textContent =
-        "The form is working, but the trained model has not been connected yet.\n\n" +
-        "This website does not make a real machine learning prediction yet. " +
-        "We will connect the model in the next step.";
+
+      try {
+        if (typeof predictHeartDisease !== "function") {
+          throw new Error(
+            "The model file did not load. Check that model.js exists in the repository."
+          );
+        }
+
+        const formData = new FormData(form);
+        const input = {};
+
+        for (const [key, value] of formData.entries()) {
+          input[key] = value;
+        }
+
+        const prediction = predictHeartDisease(input);
+        const percentage = prediction.percentage;
+
+        result.classList.add("show");
+        result.classList.remove("success", "warning");
+
+        if (prediction.prediction === 1) {
+          result.classList.add("warning");
+          resultTitle.textContent = "Model Prediction: Class 1";
+          resultDescription.textContent =
+            "The model predicts the heart-disease-positive class for these inputs. This is not a diagnosis.";
+        } else {
+          result.classList.add("success");
+          resultTitle.textContent = "Model Prediction: Class 0";
+          resultDescription.textContent =
+            "The model predicts the heart-disease-negative class for these inputs. This does not rule out heart disease.";
+        }
+
+        probabilityText.textContent =
+          "Estimated model probability of class 1: " + percentage + "%";
+
+        probabilityBar.style.width = percentage + "%";
+
+        result.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest"
+        });
+      } catch (error) {
+        result.classList.add("show", "warning");
+        result.classList.remove("success");
+        resultTitle.textContent = "Prediction Error";
+        resultDescription.textContent = error.message;
+        probabilityText.textContent = "";
+        probabilityBar.style.width = "0%";
+      }
+    });
+
+    form.addEventListener("reset", function () {
+      result.classList.remove("show", "success", "warning");
+      resultTitle.textContent = "";
+      resultDescription.textContent = "";
+      probabilityText.textContent = "";
+      probabilityBar.style.width = "0%";
     });
   </script>
 </body>
